@@ -23,7 +23,6 @@ export const useScrollEvents = ({ bottom, top, offset = 300 }) => {
       const hasReachedBottom =
         scrollHeight - offset - scrollTop <= clientHeight;
       const hasReachedTop = scrollTop === 0;
-      hasReachedBottom && console.log("hasReachedBottom");
       hasReachedBottom &&
         typeof debounced.bottom === "function" &&
         debounced.bottom(e);

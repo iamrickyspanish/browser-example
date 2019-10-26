@@ -1,7 +1,9 @@
 export const initialState = {
   items: [],
+  totalCount: 0,
   filterData: {},
-  paginationData: { page: 1, perPage: 20 },
+  offset: 0,
+  limit: 20,
   queryData: {},
   isLoading: false,
   hasError: false
@@ -15,22 +17,20 @@ const reducer = (state = initialState, action) => {
         filterData: action.filterData,
         queryData: {
           ...action.filterData,
-          ...state.paginationData
+          offset: initialState.offset,
+          limit: initialState.limit
         },
-        paginationData: initialState.paginationData,
+        offset: initialState.offset,
+        limit: initialState.limit,
         items: []
       };
     case "MORE":
       return {
         ...state,
-        paginationData: {
-          ...state.paginationData,
-          page: state.paginationData.page + 1
-        },
+        offset: state.offset + state.limit,
         queryData: {
-          ...state.filterData,
-          ...state.paginationData,
-          page: state.paginationData.page + 1
+          ...state.queryData,
+          offset: state.offset + state.limit
         }
       };
     case "REQUEST":
@@ -52,6 +52,11 @@ const reducer = (state = initialState, action) => {
         isLoading: false,
         hasError: true
       };
+    case "TOTAL_COUNT":
+      return {
+        ...state,
+        totalCount: action.value
+      };
     default:
       return state;
   }
@@ -61,6 +66,7 @@ export const filterItems = filterData => ({ type: "FILTER", filterData });
 export const loadMoreItems = () => ({ type: "MORE" });
 export const requestItems = () => ({ type: "REQUEST" });
 export const receiveItems = items => ({ type: "RECEIVE", items });
+export const receiveTotalCount = items => ({ type: "TOTAL_COUNT", items });
 export const receiveError = error => ({ type: "ERROR", error });
 
 export default reducer;

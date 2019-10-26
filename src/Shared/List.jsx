@@ -4,20 +4,23 @@ import PropTypes from "prop-types";
 import { Flex } from "@rebass/grid";
 
 export const Primitive = props => (
-  <div>
-    {props.items.length === 0 && props.renderEmpty()}
-    {props.items.map(item => props.renderItem(item))}
-  </div>
+  <Flex flexDirection="column">
+    {props.items.length === 0 &&
+      typeof props.renderEmpty === "function" &&
+      props.renderEmpty()}
+    {props.items.map(props.renderItem)}
+  </Flex>
 );
 
 Primitive.propTypes = {
   items: PropTypes.array,
   renderItem: PropTypes.func.isRequired,
-  renderEmpty: PropTypes.func.isRequired
+  renderEmpty: PropTypes.func
 };
 
 Primitive.defaultProps = {
-  items: []
+  items: [],
+  renderEmpty: null
 };
 
 export default Primitive;

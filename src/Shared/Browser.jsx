@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 
-import pick from "lodash/pick";
-
-import { Flex, Box } from "@rebass/grid";
+import { Flex } from "@rebass/grid";
 
 import Filter from "./Filter";
 import List from "./List";
@@ -17,15 +15,19 @@ export const Primitive = props => (
     <Flex p={2}>
       <Filter onSubmit={props.handleFilter} />
     </Flex>
-    <Scroll bottom={props.loadMore}>
-      <List
-        items={props.items || []}
-        renderItem={props.renderItem}
-        renderEmpty={
-          props.hasError || props.isLoading ? () => null : props.renderEmpty
-        }
-      />
-      {props.isLoading && <Box p={2}>loading</Box>}
+    <Scroll
+      disabled={props.isLoading && props.items.length === 0}
+      bottom={props.loadMore}
+    >
+      <List items={props.items} renderItem={props.renderItem} />
+      {props.isLoading && (
+        <List
+          items={props.placeholderItems}
+          renderItem={(item, i) =>
+            React.cloneElement(item, { key: `iph_${i}` })
+          }
+        />
+      )}
       {props.hasError && (
         <Flex
           flexDirection="column"
@@ -48,25 +50,59 @@ Primitive.propTypes = {
   handleFilter: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   hasError: PropTypes.bool,
-  loadMore: PropTypes.func
+  loadMore: PropTypes.func,
+  placeholderItems: PropTypes.arrayOf(PropTypes.node)
 };
 
 Primitive.defaultProps = {
   renderEmpty: () => "no items available",
+  items: [],
   filterData: {},
   isLoading: false,
-  hasError: false
+  hasError: false,
+  placeholderItems: []
 };
 
+///////////////////////////////////////
+
+const mapQueryData = ({ offset, limit, ...restQueryData }) => ({
+  ...restQueryData,
+  page: Math.floor(offset / limit) + 1,
+  per_page: limit
+});
+
+const mapResponseToItems = response => response.items || [];
+
 export const Container = props => {
-  const { items, hasError, isLoading, filter, more } = useIndex(props.getItems);
+  const { getItems, renderItem, renderEmpty, placeholderItem } = props;
+
+  const enhancedGetItems = useCallback(
+    args => {
+      return getItems(args);
+    },
+    [getItems]
+  );
+
+  const { items, hasError, isLoading, filter, more, totalCount } = useIndex(
+    enhancedGetItems,
+    { mapQueryData, mapResponseToItems }
+  );
+
+  const hasMore = useMemo(() => items.length < totalCount, [totalCount, items]);
+
+  const placeholderItems = useMemo(() => new Array(20).fill(placeholderItem), [
+    placeholderItem
+  ]);
+
   const newProps = {
     handleFilter: filter,
     items,
     isLoading,
     hasError,
-    loadMore: isLoading ? null : more,
-    ...pick(props, ["renderItem", "renderEmpty"])
+    loadMore: isLoading && hasMore ? null : more,
+    renderItem,
+    renderEmpty,
+    placeholderItems
   };
 
   return <Primitive {...newProps} />;
@@ -76,11 +112,13 @@ Container.propTypes = {
   getItems: PropTypes.func.isRequired,
   renderItem: PropTypes.func.isRequired,
   renderEmpty: PropTypes.func,
-  itemsPerPage: PropTypes.number
+  itemsPerPage: PropTypes.number,
+  placeholderItem: PropTypes.node
 };
 
 Container.defaultProps = {
-  itemsPerPage: 20
+  itemsPerPage: 20,
+  placeholderItem: null
 };
 
 export default Container;
