@@ -14,7 +14,7 @@ const fetchRepositories = async data => {
 };
 
 const renderItem = repository => (
-  <Item data={repository} key={repository.full_name} />
+  <Item repository={repository} key={repository.full_name} />
 );
 
 export const Container = () => {
