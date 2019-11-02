@@ -6,6 +6,8 @@ import { ThemeProvider } from "styled-components";
 import RepositoryBrowser from "Repository/Browser";
 import RepositoryItem from "Repository/Item";
 
+import { Flex, Box } from "@rebass/grid";
+
 import "./styles.css";
 
 const favoriteRepoId = 10270250;
@@ -13,14 +15,21 @@ const favoriteRepoId = 10270250;
 function App() {
   return (
     <ThemeProvider theme={{}}>
-      <div className="App">
-        <div>
+      <Flex
+        style={{
+          height: "100vh",
+          fontFamily: "sans-serif",
+          textAlign: "center"
+        }}
+        flexDirection="column"
+      >
+        <Box>
           <b>favorite repository</b>
           <br />
           <RepositoryItem id={favoriteRepoId} />
-        </div>
+        </Box>
         <RepositoryBrowser />
-      </div>
+      </Flex>
     </ThemeProvider>
   );
 }

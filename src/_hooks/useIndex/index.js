@@ -19,7 +19,6 @@ import indexReducer, {
 
 const defaultOptions = {
   limit: 20,
-  offset: 0,
   mapQueryData: identity,
   mapResponseToItems: identity,
   mapResponseToTotalCount: null,
@@ -27,8 +26,6 @@ const defaultOptions = {
 };
 
 export const useIndex = (getItems, _options = {}) => {
-  const [state, dispatch] = useReducer(indexReducer, initialState);
-
   const options = useMemo(
     () => ({
       ...defaultOptions,
@@ -37,9 +34,24 @@ export const useIndex = (getItems, _options = {}) => {
     [_options]
   );
 
-  const { queryData, isLoading, items, hasError, totalCount } = state;
+  const {
+    fetchOnMount,
+    mapResponseToItems,
+    mapResponseToTotalCount,
+    limit
+  } = options;
 
-  const { fetchOnMount, mapResponseToItems, mapResponseToTotalCount } = options;
+  const _initialState = useMemo(
+    () => ({
+      ...initialState,
+      limit
+    }),
+    [limit]
+  );
+
+  const [state, dispatch] = useReducer(indexReducer, _initialState);
+
+  const { queryData, isLoading, items, hasError, totalCount } = state;
 
   const filter = useCallback(filterData => dispatch(filterItems(filterData)), [
     dispatch

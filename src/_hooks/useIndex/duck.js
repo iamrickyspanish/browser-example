@@ -9,7 +9,7 @@ export const initialState = {
   hasError: false
 };
 
-const reducer = (state = initialState, action) => {
+const reducer = (state, action) => {
   switch (action.type) {
     case "FILTER":
       return {
@@ -18,10 +18,9 @@ const reducer = (state = initialState, action) => {
         queryData: {
           ...action.filterData,
           offset: initialState.offset,
-          limit: initialState.limit
+          limit: state.limit
         },
         offset: initialState.offset,
-        limit: initialState.limit,
         items: []
       };
     case "MORE":

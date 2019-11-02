@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 
 import { Flex } from "@rebass/grid";
@@ -9,6 +9,8 @@ import List from "./List";
 import Scroll from "Shared/Scroll";
 
 import useIndex from "_hooks/useIndex";
+
+//////////////// primitive
 
 export const Primitive = props => (
   <Flex flexDirection="column" style={{ height: "100%" }}>
@@ -63,7 +65,7 @@ Primitive.defaultProps = {
   placeholderItems: []
 };
 
-///////////////////////////////////////
+/////////////// default
 
 const mapQueryData = ({ offset, limit, ...restQueryData }) => ({
   ...restQueryData,
@@ -74,25 +76,28 @@ const mapQueryData = ({ offset, limit, ...restQueryData }) => ({
 const mapResponseToItems = response => response.items || [];
 
 export const Container = props => {
-  const { getItems, renderItem, renderEmpty, placeholderItem } = props;
-
-  const enhancedGetItems = useCallback(
-    args => {
-      return getItems(args);
-    },
-    [getItems]
-  );
+  const {
+    getItems,
+    renderItem,
+    renderEmpty,
+    renderItemPlaceholder,
+    limit
+  } = props;
 
   const { items, hasError, isLoading, filter, more, totalCount } = useIndex(
-    enhancedGetItems,
-    { mapQueryData, mapResponseToItems }
+    getItems,
+    { mapQueryData, mapResponseToItems, limit }
   );
 
   const hasMore = useMemo(() => items.length < totalCount, [totalCount, items]);
 
-  const placeholderItems = useMemo(() => new Array(20).fill(placeholderItem), [
-    placeholderItem
-  ]);
+  const placeholderItems = useMemo(
+    () =>
+      typeof renderItemPlaceholder === "function"
+        ? new Array(limit).fill(renderItemPlaceholder())
+        : [],
+    [renderItemPlaceholder, limit]
+  );
 
   const newProps = {
     handleFilter: filter,
@@ -112,13 +117,13 @@ Container.propTypes = {
   getItems: PropTypes.func.isRequired,
   renderItem: PropTypes.func.isRequired,
   renderEmpty: PropTypes.func,
-  itemsPerPage: PropTypes.number,
-  placeholderItem: PropTypes.node
+  limit: PropTypes.number,
+  renderItemPlaceholder: PropTypes.func
 };
 
 Container.defaultProps = {
-  itemsPerPage: 20,
-  placeholderItem: null
+  limit: 20,
+  renderItemPlaceholder: null
 };
 
 export default Container;

@@ -17,7 +17,6 @@ const Item = props => {
   });
 
   const [renderFn, arg] = useMemo(() => {
-    console.log("ran");
     if (isLoading && typeof renderPlaceholder === "function") {
       return [renderPlaceholder];
     } else if (error && typeof renderError === "function") {
