@@ -12,14 +12,12 @@ const renderItem = repository => (
 
 const renderItemPlaceholder = () => <Placeholder />;
 
-export const Container = () => {
-  return (
-    <Browser
-      getItems={fetchRepositories}
-      renderItem={renderItem}
-      renderItemPlaceholder={renderItemPlaceholder}
-    />
-  );
-};
+export const Container = () => (
+  <Browser
+    getItems={fetchRepositories}
+    renderItem={renderItem}
+    renderItemPlaceholder={renderItemPlaceholder}
+  />
+);
 
 export default Container;

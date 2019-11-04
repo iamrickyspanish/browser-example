@@ -19,7 +19,7 @@ import indexReducer, {
 
 const defaultOptions = {
   limit: 20,
-  mapQueryData: identity,
+  mapRequestData: identity,
   mapResponseToItems: identity,
   mapResponseToTotalCount: null,
   fetchOnMount: true
@@ -35,6 +35,7 @@ export const useIndex = (getItems, _options = {}) => {
   );
 
   const {
+    mapRequestData,
     fetchOnMount,
     mapResponseToItems,
     mapResponseToTotalCount,
@@ -67,7 +68,7 @@ export const useIndex = (getItems, _options = {}) => {
   const [response, error, promiseState] = usePromise(() => {
     return isEmpty(queryData)
       ? Promise.resolve([])
-      : getItems(options.mapQueryData(queryData));
+      : getItems(mapRequestData(queryData));
   }, [getItems, queryData]);
 
   useEffect(() => {

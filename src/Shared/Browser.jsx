@@ -67,7 +67,7 @@ Primitive.defaultProps = {
 
 /////////////// default
 
-const mapQueryData = ({ offset, limit, ...restQueryData }) => ({
+const mapRequestData = ({ offset, limit, ...restQueryData }) => ({
   ...restQueryData,
   page: Math.floor(offset / limit) + 1,
   per_page: limit
@@ -86,7 +86,7 @@ export const Container = props => {
 
   const { items, hasError, isLoading, filter, more, totalCount } = useIndex(
     getItems,
-    { mapQueryData, mapResponseToItems, limit }
+    { mapRequestData, mapResponseToItems, limit }
   );
 
   const hasMore = useMemo(() => items.length < totalCount, [totalCount, items]);
